@@ -19,3 +19,18 @@ const _toString = Object.prototype.toString;
 //     })
 //
 // }
+
+export const getMutipleValue = (keyValue: KeyValue, joiner: String) => {
+    const keys: string[] = Object.keys(keyValue)
+    let mutiple = '';
+    let value: any[] = [];
+    keys.forEach((key, index) => {
+        if(index === 0) {
+            mutiple += ` ${key} = ? `
+        } else {
+            mutiple += ` ${joiner} ${key} = ? `
+        }
+        value.push(keyValue[key])
+    })
+    return { mutiple, value }
+}

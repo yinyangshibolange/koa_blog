@@ -4,8 +4,13 @@ import * as Router from "koa-router";
 export default (router: Router) => {
     router
         .get('/api/artical', async (ctx) => {
-            // const data = await db.getArticals()
             ctx.body = await db.getArticals(ctx.query)
+        })
+        .delete('/api/artical', async (ctx) => {
+            ctx.body = await db.deleteArtical(ctx.query.id)
+        })
+        .put('/api/artical', async (ctx) => {
+            ctx.body = await db.updateArtical(ctx.request.body)
         })
 
     router.get('/api/artical/:userid', async (ctx) => {
@@ -14,7 +19,8 @@ export default (router: Router) => {
                 user: ctx.params.userid,
                 title: '文章标题',
                 time: time,
-                lasttime: time
+                lasttime: time,
+                content: '*请在此处开始输入文章内容*'
             }
             ctx.body = await db.addArtical(artical)
         })
