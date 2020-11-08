@@ -53,7 +53,21 @@ export const addTag = (tag: KeyValue) => {
     })
 }
 
-// 获取标签， 热门标签放最前面
+// 获取热门标签
+export  const getHotTags = (hotn:number = 10) => {
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT tag, count(1) count FROM artical_tags GROUP BY tag order by count desc LIMIT ?', hotn, function (error: Error, results: any, fields: any) {
+            // error will be an Error if one occurred during the query
+            if(error) {
+                reject(error);
+                return;
+            }
+            resolve(results)
+        })
+    })
+}
+
+// 获取所有标签
 export const getTags = () => {
     return new Promise((resolve, reject) => {
         connection.query('select * from tagcloud', function (error: Error, results: any, fields: any) {
