@@ -48,6 +48,15 @@ export default (router: Router ) => {
      */
     router.post('/xauth/login', function (ctx: any, next: Next) {
         return passport.authenticate('local', function (err: Error, user: any, info: any, status: any) {
+            console.log(err)
+            console.log(user)
+            console.log(info)
+            console.log(status)
+            if(err) {
+                console.log(err)
+                ctx.body = err
+                return
+            }
             if (user) {
                 ctx.body = 'Y'
                 return ctx.login(user)
