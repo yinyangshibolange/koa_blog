@@ -12,9 +12,21 @@ export const getUsers = () => {
     })
 }
 
-export const getUserByKeyword = (name: string) => {
+export const getUserById = (id: number | string) => {
     return new Promise((resolve, reject) => {
-        connection.query('select * from user where name = ? or email = ?', [name, name], function (error: Error, results: any, fields: any) {
+        connection.query('select * from user where id = ?', id, function (error: Error, results: any, fields: any) {
+            if(error) {
+                reject(error);
+                return;
+            }
+            resolve(results)
+        })
+    })
+}
+
+export const getUserByKeyword = (username: string) => {
+    return new Promise((resolve, reject) => {
+        connection.query('select * from user where username = ? or email = ?', [username, username], function (error: Error, results: any, fields: any) {
             if(error) {
                 reject(error);
                 return;

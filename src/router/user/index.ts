@@ -6,4 +6,8 @@ export default (router: Router) => {
         // const data = await db.getUsers()
         ctx.body = await db.getUsers()
     })
+
+    router.get('/api/getUser', async (ctx: any) => {
+        ctx.body= ctx.session.passport.user
+    })
 }
