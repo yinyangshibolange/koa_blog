@@ -9,20 +9,30 @@ export default (router: Router) => {
             artical_tags.forEach((item: any) => {
                 temps.push(item.tag)
             })
-            const tags = await db.getTagNames(temps)
-            ctx.body = tags
+            ctx.body = await db.getTagNames(temps)
         })
         .post('/api/tag', async (ctx) => {
-            const { artical, tag } = ctx.request.body
-            ctx.body = await db.addArticalTag(artical, tag)
+            ctx.body = await db.addArticalTag(ctx.request.body.artical, ctx.request.body.tag)
         })
         .delete('/api/tag', async (ctx) => {
             ctx.body = await db.deleteArticalTag(ctx.query.artical, ctx.query.tag)
         })
 
+    router.get('/api/hottag', async (ctx: any) => {
+        const hotn = ctx.query.hotn
+        const hotTags: any = await db.getHotTags(hotn); // 获取热门标签，默认前十个
+        const tagids = hotTags.map((tag: any) => tag.id)
+        ctx.body = await db.getTagByIds(tagids)
+    })
+
+    router.get('/api/searchtag', async (ctx) => {
+        ctx.body = await db.searchTags(ctx.query.keyword);
+    })
+
     router
         .get('/api/tagcloud', async (ctx) => {
             // 获取标签云
+            ctx.body = await db.getTags();
         })
         .post('/api/tagcloud', async (ctx) => {
             // 注册标签, 如果已存在，注册失败
@@ -30,7 +40,7 @@ export default (router: Router) => {
             const resdata: any = await db.addTag({name})
             console.log(resdata)
             // 如果成功，添加到关系表
-            const resdata1 = await db.addArticalTag(artical, resdata.id)
+            await db.addArticalTag(artical, resdata.id)
             ctx.body = resdata
         })
 }

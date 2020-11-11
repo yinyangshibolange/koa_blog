@@ -67,6 +67,32 @@ export  const getHotTags = (hotn:number = 10) => {
     })
 }
 
+export const getTagByIds = (ids: any) => {
+    return new Promise((resolve, reject) => {
+        connection.query('select * from tagcloud where id in (?)', ids, function (error: Error, results: any, fields: any) {
+            // error will be an Error if one occurred during the query
+            if(error) {
+                reject(error);
+                return;
+            }
+            resolve(results)
+        })
+    })
+}
+
+export const searchTags = (keyword: string) => {
+    return new Promise((resolve, reject) => {
+        connection.query('select * from tagcloud where name like \'%?%\'', keyword, function (error: Error, results: any, fields: any) {
+            // error will be an Error if one occurred during the query
+            if(error) {
+                reject(error);
+                return;
+            }
+            resolve(results)
+        })
+    })
+}
+
 // 获取所有标签
 export const getTags = () => {
     return new Promise((resolve, reject) => {
