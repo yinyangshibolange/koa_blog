@@ -58,7 +58,7 @@ export default (router: Router ) => {
                 return
             }
             if (user) {
-                ctx.body = 'Y'
+                ctx.body = info
                 return ctx.login(user)
             } else {
                 ctx.body = info
