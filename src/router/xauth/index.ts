@@ -3,7 +3,6 @@ import {Next} from "koa";
 import passport from "../../middles/password";
 import * as Router from "koa-router";
 import * as db from '../../db'
-import router from "@router";
 const md5 = require('md5')
 
 export default (router: Router ) => {
@@ -25,14 +24,14 @@ export default (router: Router ) => {
             return
         }
         const email = ctx.request.body.email
-        const users1: any = await db.getUserByKeyword(email)
-        if(users1[0]) {
-            ctx.body = {
-                success: false,
-                data: '邮箱已存在'
-            }
-            return
-        }
+        // const users1: any = await db.getUserByKeyword(email)
+        // if(users1[0]) {
+        //     ctx.body = {
+        //         success: false,
+        //         data: '邮箱已存在'
+        //     }
+        //     return
+        // }
         const regResult = await db.addUser({
             email: email,
             username: username,

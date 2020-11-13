@@ -56,7 +56,7 @@ export const addTag = (tag: KeyValue) => {
 // 获取热门标签
 export  const getHotTags = (hotn:number = 10) => {
     return new Promise((resolve, reject) => {
-        connection.query('SELECT tag, count(1) count FROM artical_tags GROUP BY tag order by count desc LIMIT ?', hotn, function (error: Error, results: any, fields: any) {
+        connection.query('SELECT tag, count(1) count FROM artical_tags GROUP BY tag order by count desc LIMIT ?', +hotn, function (error: Error, results: any, fields: any) {
             // error will be an Error if one occurred during the query
             if(error) {
                 reject(error);
@@ -67,9 +67,22 @@ export  const getHotTags = (hotn:number = 10) => {
     })
 }
 
-export const getTagByIds = (ids: any) => {
+// export const getTagByIds = (ids: any) => {
+//     return new Promise((resolve, reject) => {
+//         connection.query('select * from tagcloud where id in (?)', ids, function (error: Error, results: any, fields: any) {
+//             // error will be an Error if one occurred during the query
+//             if(error) {
+//                 reject(error);
+//                 return;
+//             }
+//             resolve(results)
+//         })
+//     })
+// }
+
+export const getMyTagIds = (articalIds: number[]) => {
     return new Promise((resolve, reject) => {
-        connection.query('select * from tagcloud where id in (?)', ids, function (error: Error, results: any, fields: any) {
+        connection.query('select distinct tag from artical_tags where artical in (?)', [articalIds], function (error: Error, results: any, fields: any) {
             // error will be an Error if one occurred during the query
             if(error) {
                 reject(error);
@@ -108,7 +121,7 @@ export const getTags = () => {
 }
 
 // 获取tag详细， 入参为tag id数组
-export const getTagNames = (tagids: number[] | string []) => {
+export const getTagNames = (tagids: number[]) => {
     return new Promise((resolve, reject) => {
         connection.query('select * from tagcloud where id in (?)', [tagids], function (error: Error, results: any, fields: any) {
             if(error) {

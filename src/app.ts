@@ -20,7 +20,6 @@ app.use(async (ctx: any, next: Next) => {
     const apiUrlReg = /^\/api/
     if(apiUrlReg.test(ctx.originalUrl)) {
         if(ctx.isAuthenticated()) {
-            console.log('1122next')
             await next()
         } else {
             ctx.status = 401
@@ -30,11 +29,9 @@ app.use(async (ctx: any, next: Next) => {
             }
         }
     } else {
-        console.log('next')
         await next()
     }
 })
 app.use(router.routes()).use(router.allowedMethods())
-
 
 app.listen(3100)

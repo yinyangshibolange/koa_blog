@@ -3,7 +3,7 @@ import * as Router from "koa-router";
 
 export default (router: Router) => {
     router
-        .get('/api/comment', async (ctx) => {
+        .get('/public/comment', async (ctx) => {
             const resdata: any = await db.getComments(ctx.query.artical)
             // 非递归遍历算法，时间复杂度为n^2
             resdata.forEach((itemx: any) => {
