@@ -9,8 +9,8 @@ export default (router: Router) => {
     })
 
     router.get('/api/getUser', async (ctx: any) => {
-        const user = ctx.session.passport.user
-        ctx.body = await db.getUserById(user?.id)
+        const user: any = await db.getUserById(ctx.session.passport.user?.id)
+        ctx.body = user[0]
     })
 
     router.put('/api/email', async (ctx: any) => {

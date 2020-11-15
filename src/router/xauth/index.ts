@@ -8,7 +8,6 @@ const md5 = require('md5')
 export default (router: Router ) => {
     router.post('/xauth/reg', async (ctx) => {
         const username = ctx.request.body.username
-        const users: any = await db.getUserByKeyword(username)
         if(!username) {
             ctx.body = {
                 success: false,
@@ -16,6 +15,9 @@ export default (router: Router ) => {
             }
             return
         }
+        console.log(username)
+        const users: any = await db.getUserByKeyword(username)
+
         if(users[0]) {
             ctx.body = {
                 success: false,
@@ -23,15 +25,15 @@ export default (router: Router ) => {
             }
             return
         }
-        const email = ctx.request.body.email
-        // const users1: any = await db.getUserByKeyword(email)
-        // if(users1[0]) {
-        //     ctx.body = {
-        //         success: false,
-        //         data: '邮箱已存在'
-        //     }
-        //     return
-        // }
+        const email = ctx.request.body.email === ''? null: ctx.request.body.email
+        const users1: any = await db.getUserByKeyword(email)
+        if(users1[0]) {
+            ctx.body = {
+                success: false,
+                data: '邮箱已存在'
+            }
+            return
+        }
         const regResult = await db.addUser({
             email: email,
             username: username,
@@ -46,21 +48,35 @@ export default (router: Router ) => {
      * 认证登录
      */
     router.post('/xauth/login', function (ctx: any, next: Next) {
-        return passport.authenticate('local', function (err: Error, user: any, info: any, status: any) {
-            console.log(err)
-            console.log(user)
-            console.log(info)
-            console.log(status)
+        return passport.authenticate('local', {
+            successRedirect: '/?/public',
+            failureRedirect: '/auth'
+        }, function (err: Error, user: any, info: any, status: any) {
+            // console.log(err)
+            // console.log(user)
+            // console.log(info)
+            // console.log(status)
             if(err) {
                 console.log(err)
-                ctx.body = err
+                ctx.body = {
+                    success: false,
+                    data: err
+                }
                 return
             }
             if (user) {
-                ctx.body = info
-                return ctx.login(user)
+                ctx.body = {
+                    success: true,
+                    data: info
+                }
+                console.log(user)
+                return ctx.login(user,)
+                // ctx.redirect('/public')
             } else {
-                ctx.body = info
+                ctx.body = {
+                    success:false,
+                    data: info
+                }
             }
         })(ctx, next)
     })
@@ -86,10 +102,16 @@ export default (router: Router ) => {
 // 以下为自定义需要身份认证的路由
     router.post('/xauth/test', function (ctx: any, next: Next) {
         if (ctx.isAuthenticated()) {
-            ctx.body = '认证通过'
+            ctx.body = {
+                success: true,
+                data: '认证通过'
+            }
         } else {
             ctx.throw(401)
-            ctx.body = '非法访问'
+            ctx.body = {
+                success: false,
+                data: '非法访问'
+            }
         }
     })
 
