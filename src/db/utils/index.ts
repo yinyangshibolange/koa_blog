@@ -20,7 +20,7 @@ const _toString = Object.prototype.toString;
 //
 // }
 
-export const getMutipleValue = (keyValue: KeyValue, joiner: String) => {
+export const getMutipleValue = (keyValue: KeyValue, joiner: String, isnumber?: Boolean) => {
     const keys: string[] = Object.keys(keyValue)
     let mutiple = '';
     let value: any[] = [];
@@ -30,7 +30,7 @@ export const getMutipleValue = (keyValue: KeyValue, joiner: String) => {
         } else {
             mutiple += ` ${joiner} ${key} = ? `
         }
-        value.push(keyValue[key])
+        value.push(isnumber? +keyValue[key]: keyValue[key])
     })
     return { mutiple, value }
 }

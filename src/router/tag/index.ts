@@ -13,9 +13,7 @@ export default (router: Router) => {
             ctx.body = await db.getTagNames(temps)
         })
         .post('/api/tag', async (ctx: any) => {
-            const _isMyArtical = isMyArtical({
-                artical: ctx.request.body.artical
-            }, ctx.session.passport.user)
+            const _isMyArtical = isMyArtical(ctx.request.body.artical, ctx.session.passport.user)
             if(_isMyArtical) {
                 ctx.body = await db.addArticalTag(ctx.request.body.artical, ctx.request.body.tag)
             } else {
@@ -26,9 +24,7 @@ export default (router: Router) => {
             }
         })
         .delete('/api/tag', async (ctx: any) => {
-            const _isMyArtical = isMyArtical({
-                artical: ctx.query.artical
-            }, ctx.session.passport.user)
+            const _isMyArtical = isMyArtical(ctx.query.artical, ctx.session.passport.user)
             if(_isMyArtical) {
                 ctx.body = await db.deleteArticalTag(ctx.query.artical, ctx.query.tag)
             } else {
@@ -41,13 +37,15 @@ export default (router: Router) => {
 
     router.get('/api/mytags', async (ctx: any) => {
         const user = ctx.session.passport.user
-        const myArticals: any = await db.getArticals({
-            user: user.id
-        })
+        const myArticals: any = await db.getUserArticals(user.id, ctx.query.artical)
         if(myArticals && myArticals.length > 0) {
             const articalIds = myArticals.map((at: any) => +at.id)
             const tags: any = await db.getMyTagIds(articalIds)
-            ctx.body = await db.getTagNames(tags?.map((tag: any) => +tag.tag))
+            if(tags && tags.length > 0) {
+                ctx.body = await db.getTagNames(tags?.map((tag: any) => +tag.tag))
+            } else {
+                ctx.body  = []
+            }
         } else {
             ctx.body = []
         }
@@ -70,9 +68,7 @@ export default (router: Router) => {
             ctx.body = await db.getTags();
         })
         .post('/api/tagcloud', async (ctx: any) => {
-            const _isMyArtical = isMyArtical({
-                artical: ctx.request.body.artical
-            }, ctx.session.passport.user)
+            const _isMyArtical = isMyArtical(ctx.request.body.artical, ctx.session.passport.user)
             if (_isMyArtical) {
                 // 注册标签, 如果已存在，注册失败
                 const { artical, name } = ctx.request.body

@@ -1,6 +1,6 @@
 import * as db from "../../db";
 
-export default async (articalParam: any, user: any) => {
-    const resArticals: any = await db.getArticals(articalParam)
-    return resArticals[0]?.user === user.id
+export default async (artical: any, user: any) => {
+    const resArticals: any = await db.getUserArticals(user.id, artical)
+    return resArticals && resArticals.length > 0
 }

@@ -82,7 +82,15 @@ export  const getHotTags = (hotn:number = 10) => {
 
 export const getMyTagIds = (articalIds: number[]) => {
     return new Promise((resolve, reject) => {
-        connection.query('select distinct tag from artical_tags where artical in (?)', [articalIds], function (error: Error, results: any, fields: any) {
+        let sql, value
+        if(articalIds.length > 1) {
+            sql = 'select distinct tag from artical_tags where artical in (?)'
+            value = [articalIds]
+        } else if(articalIds.length === 1) {
+            sql = 'select distinct tag from artical_tags where artical = ?'
+            value = articalIds[0]
+        }
+        connection.query(sql, value, function (error: Error, results: any, fields: any) {
             // error will be an Error if one occurred during the query
             if(error) {
                 reject(error);
@@ -123,7 +131,15 @@ export const getTags = () => {
 // 获取tag详细， 入参为tag id数组
 export const getTagNames = (tagids: number[]) => {
     return new Promise((resolve, reject) => {
-        connection.query('select * from tagcloud where id in (?)', [tagids], function (error: Error, results: any, fields: any) {
+        let sql, value
+        if(tagids.length > 1) {
+            sql = 'select * from tagcloud where id in (?)'
+            value = [tagids]
+        } else if(tagids.length === 1) {
+            sql = 'select * from tagcloud where id = ?'
+            value = tagids[0]
+        }
+        connection.query(sql, value, function (error: Error, results: any, fields: any) {
             if(error) {
                 reject(error);
                 return;

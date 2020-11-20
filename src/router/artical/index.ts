@@ -6,14 +6,10 @@ export default (router: Router) => {
     router
         .get('/api/myartical', async (ctx: any) => {
             const user = ctx.session.passport.user
-            ctx.body = await db.getArticals({
-                user: user.id
-            })
+            ctx.body = await db.getUserArticals(user.id, ctx.query.artical)
         })
         .delete('/api/myartical', async (ctx: any) => {
-            const _isMyArtical = isMyArtical({
-                artical: ctx.query.artical
-            }, ctx.session.passport.user)
+            const _isMyArtical = isMyArtical(ctx.query.artical, ctx.session.passport.user)
             if (_isMyArtical) {
                 await db.deleteArtical(ctx.query.artical)
                 ctx.body = {
@@ -28,14 +24,23 @@ export default (router: Router) => {
             }
         })
         .put('/api/myartical', async (ctx: any) => {
-            const _isMyArtical = isMyArtical({
-                artical: ctx.request.body.artical
-            }, ctx.session.passport.user)
+            const _isMyArtical = isMyArtical(ctx.request.body.artical, ctx.session.passport.user)
             if (_isMyArtical) {
-                await db.updateArtical(ctx.request.body)
-                ctx.body = {
-                    success: true,
-                    data: '保存成功'
+                const updateBody = {
+                    lasttime: new Date(),
+                    ...ctx.request.body,
+                }
+                const updateResult: any = await db.updateArtical(updateBody)
+                if(updateResult.affectedRows > 0) {
+                    ctx.body = {
+                        success: true,
+                        data: '保存成功'
+                    }
+                } else {
+                    ctx.body = {
+                        success: false,
+                        data: '保存失败'
+                    }
                 }
             } else {
                 ctx.body = {
@@ -46,7 +51,7 @@ export default (router: Router) => {
         })
 
     // 创建
-    router.get('/api/artical', async (ctx: any) => {
+    router.post('/api/createartical', async (ctx: any) => {
         const user = ctx.session.passport.user
         const time = new Date()
         const artical = {
@@ -54,14 +59,33 @@ export default (router: Router) => {
             title: '文章标题',
             time: time,
             lasttime: time,
-            content: '*请在此处开始输入文章内容*'
+            content: '*请在此处开始输入文章内容*',
         }
-        ctx.body = await db.addArtical(artical)
+
+        const createdArticalId = await db.addArtical(artical)
+        if(createdArticalId !== undefined && createdArticalId !== null) {
+            const articalid = ctx.request.body.artical
+            const tagid = ctx.request.body.tag
+            if(articalid !== undefined && articalid !== null && tagid !== undefined && tagid !== null) {
+                await db.addArticalTag(articalid, tagid)
+            }
+            ctx.body = createdArticalId
+        }
+
+
+    })
+
+    router.get('/public/artical', async (ctx: any) => {
+        const articals: any = await db.getArticalIdsByTag(ctx.query.tag)
+        const articalIds = articals.map((artical: any) => artical.artical)
+        ctx.body = await db.getArticalByArticalIds(articalIds)
     })
 
     router
-        .get('/public/artical', async (ctx) => {
-            ctx.body = await db.getArticals(ctx.query)
+        .get('/api/artical', async (ctx: any) => {
+            const articals: any = await db.getArticalIdsByTag(ctx.query.tag)
+            const articalIds = articals.map((artical: any) => artical.artical)
+            ctx.body = await db.getArticalByArticalIds(articalIds, ctx.session.passport.user?.id)
         })
 
 }
